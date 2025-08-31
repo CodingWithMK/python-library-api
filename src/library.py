@@ -1,8 +1,12 @@
+from dataclasses import dataclass
 from book import Book
+from typing import Optional, List
 
-class Library(store_path="library.json"):
-    def __init__(self, categories: str, books: Book):
-        self.categories = categories
-        self.books = Book
+
+@dataclass
+class Library:
+    store_path: str
+    books: List
+
 
     

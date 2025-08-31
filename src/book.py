@@ -11,8 +11,8 @@ class Book:
     year: int
     genre: Optional[str] = None
     is_borrowed: bool = field(default=False, compare=False)
-    borrower_id = Optional[str] = field(default=None, compare=False)
-    borrowed_at = Optional[datetime] = field(default=None, compare=False)
+    borrower_id: Optional[str] = field(default=None, compare=False)
+    borrowed_at: Optional[datetime] = field(default=None, compare=False)
 
     def __post_init__(self):
         """
@@ -36,9 +36,9 @@ class Book:
         if len(clean_isbn) == 10:
             if not self._validate_isbn10(clean_isbn):
                 raise ValueError(f"Invalid ISBN-10 checksum: {self.isbn}")
-            else:
-                if not self._validate_isbn13(clean_isbn):
-                    raise ValueError(f"Invalid ISBN-13 checksum: {self.isbn}")
+        else:
+            if not self._validate_isbn13(clean_isbn):
+                raise ValueError(f"Invalid ISBN-13 checksum: {self.isbn}")
         
 
     @staticmethod
@@ -49,54 +49,45 @@ class Book:
         return clean_isbn
 
     @staticmethod
-    def _validate_isbn(self, isbn: str) -> str:
-        self.clean_isbn = self._clean_isbn(isbn)
+    def _validate_isbn(self, isbn: str) -> bool:
+        clean_isbn = self._clean_isbn(isbn)
 
-        if len(self.clean_isbn) == 10:
-            return self._validate_isbn10(self.clean_isbn)
-        elif len(self.clean_isbn) == 13:
-            return self._validate_isbn13(self.clean_isbn)
+        if len(clean_isbn) == 10:
+            return self._validate_isbn10(clean_isbn)
+        elif len(clean_isbn) == 13:
+            return self._validate_isbn13(clean_isbn)
         else:
             raise ValueError
     
     @staticmethod
-    def _validate_isbn10(self, isbn: str) -> str:
-        self.isbn = isbn
-        
-        self.isbn_list = list(self.isbn)
-        multiplier = 10
-        sum = 0
-        for digit in self.isbn_list:
-            product = digit * multiplier
-            multiplier -= 1
-            sum += product
+    def _validate_isbn10(isbn: str) -> bool:
 
-        if sum % 11 == 0:
-            return f"ISBN-10 '{self.isbn}' is valid."
-        else:
-            return f"ISBN-10 '{self.isbn}' is not valid!"
+        if len(isbn) != 10:
+            return False
+
+        # Checksum calculation
+        total = 0
+        for digit, char in enumerate(isbn):
+            if digit == 9 and char == "X": # Controling if last character is 'X'
+                value = 10
+            elif char.isdigit():
+                value = int(char)
+            else:
+                return False
+
+            weight = 10 - digit
+            total += value * weight
+
+
+        # Mod 11 Control: Is total value divisible by 11
+        return total % 11 == 0
             
     @staticmethod
-    def _validate_isbn13(self, isbn: str) -> str:
-        self.isbn = isbn
-
-        self.isbn_list = list(self.isbn)
-        sum = 0
-        multiply_one = self.isbn_list[0:13:2]
-        multiply_three = self.isbn_list[1:12:2]
-
-        for digit_one in multiply_one:
-            result_one = int(digit_one) * 1
-            sum += result_one
-
-        for digit_three in multiply_three:
-            result_three = int(digit_three) * 3
-            sum += result_three
+    def _validate_isbn13(isbn: str) -> bool:
         
-        if sum % 10 == 0:
-            return f"ISBN-13 '{self.isbn}' is valid."
-        else:
-            return f"ISBN-13 '{self.isbn}' is not valid!"
+        total = sum(int(digit) * (3 if num % 2 == 1 else 1) for num, digit in enumerate(isbn))
+        
+        return total % 10 == 0
 
     
     def __str__(self):
@@ -108,4 +99,4 @@ class Book:
 
     def return_book(self) -> None:
         """Return a book."""
-        pass 
+        pass
