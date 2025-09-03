@@ -91,12 +91,24 @@ class Book:
 
     
     def __str__(self):
-        return f"{self.title} from {self.author} published in {self.year} corresponds to genre {self.genre}.\nBorrow Status: {self.is_borrowed}\nBorrowed at: {self.borrowed_at}"       
+        return f"{self.title} from {self.author} published in {self.year} corresponds to genre {self.genre}.\nBorrow Status: {self.is_borrowed}\nBorrowed at: {self.borrowed_at}"
 
-    def borrow(self, borrower_name: str) -> None:
+    def validate_year(self):
+        """Validate publication year of the book."""
+          
+
+    def borrow_book(self, borrower_name: str) -> None:
         """Borrow a book."""
-        pass
+        if not self.is_borrowed:
+            self.is_borrowed = True
+        else:
+            raise ValueError(f"{self.title} is already borrowed by {borrower_name}.")
 
     def return_book(self) -> None:
         """Return a book."""
-        pass
+        if self.is_borrowed:
+            self.is_borrowed = True
+        else:
+            raise ValueError(f"{self.title} was not borrowed. Borrow now.")
+        
+    
