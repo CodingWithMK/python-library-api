@@ -95,6 +95,12 @@ class Book:
 
     def validate_year(self):
         """Validate publication year of the book."""
+        if self.year <= 0:
+            raise ValueError(f"Year of Publishment cannot be zero.")
+        elif self.year <= 1450 or self.year > datetime.now().year:
+            raise ValueError(f"The book {self.title} from {self.year} is out of publishment range.")
+        else:
+            return self.year
           
 
     def borrow_book(self, borrower_name: str) -> None:
