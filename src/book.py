@@ -13,6 +13,7 @@ class Book:
     is_borrowed: bool = field(default=False, compare=False)
     borrower_id: Optional[str] = field(default=None, compare=False)
     borrowed_at: Optional[datetime] = field(default=None, compare=False)
+    returned_at: Optional[datetime] = field(default=None, compare=False)
 
     def __post_init__(self):
         """
@@ -95,9 +96,11 @@ class Book:
 
     def validate_year(self):
         """Validate publication year of the book."""
-        if self.year <= 0:
+        if not isinstance(self.year, int):
+            raise ValueError(f"Year {self.year} of publishment not valid. Must be an integer. Please check and try again.")
+        elif self.year <= 0:
             raise ValueError(f"Year of Publishment cannot be zero.")
-        elif self.year <= 1450 or self.year > datetime.now().year:
+        elif self.year < 1450 or self.year > datetime.now().year:
             raise ValueError(f"The book {self.title} from {self.year} is out of publishment range.")
         else:
             return self.year
@@ -105,16 +108,25 @@ class Book:
 
     def borrow_book(self, borrower_name: str) -> None:
         """Borrow a book."""
+        if not isinstance(borrower_name, str) or not borrower_name.strip():
+            raise ValueError("Borrower name cannot be empty. Please check and try again.")
+        
         if not self.is_borrowed:
             self.is_borrowed = True
         else:
             raise ValueError(f"{self.title} is already borrowed by {borrower_name}.")
+        
+        self.borrower_id = borrower_name
+        self.borrowed_at = datetime.now()
+
 
     def return_book(self) -> None:
         """Return a book."""
         if self.is_borrowed:
-            self.is_borrowed = True
+            self.is_borrowed = False
         else:
             raise ValueError(f"{self.title} was not borrowed. Borrow now.")
+        
+        self.returned_at = datetime.now()
         
     
