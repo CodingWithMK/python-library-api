@@ -113,8 +113,10 @@ class Book:
         
         if not self.is_borrowed:
             self.is_borrowed = True
+            self.borrower_id = borrower_name
         else:
             raise ValueError(f"{self.title} is already borrowed by {borrower_name}.")
+            self.is_borrowed = False
         
         self.borrower_id = borrower_name
         self.borrowed_at = datetime.now()
@@ -126,7 +128,10 @@ class Book:
             self.is_borrowed = False
         else:
             raise ValueError(f"{self.title} was not borrowed. Borrow now.")
+            self.is_borrowed = True
         
         self.returned_at = datetime.now()
+        self.borrower_id = None
+        self.borrowed_at = None
         
     
