@@ -1,8 +1,8 @@
 import pytest
 from datetime import datetime
-from book import Book
+from src.book import Book
 
-# --- Fixture: Test için hazır Book nesnesi ---
+# --- Fixture: Test-Ready book object ---
 @pytest.fixture
 def sample_book():
     """Create a sample book for testing"""
@@ -14,50 +14,46 @@ def sample_book():
         genre="Fiction"
     )
 
-# --- Test: Book Oluşturma ---
+# --- Test: Create book ---
 def test_book_creation(sample_book):
     """Test if book is created correctly"""
-    # TODO: Assert'lerle kontrol et:
-    # - isbn doğru mu?
-    # - title doğru mu?
-    # - is_borrowed False mu?
     assert sample_book.isbn == "0306406152"
-    # TODO: Diğer assert'leri ekle
-    pass
+    assert sample_book.title == "Test Book"
+    assert sample_book.author == "Test Author"
+    assert sample_book.year == 2020
+    assert sample_book.genre == "Fiction"
 
-# --- Test: ISBN Validasyonu ---
+# --- Test: ISBN Validation ---
 def test_invalid_isbn():
     """Test invalid ISBN raises ValueError"""
-    # TODO: pytest.raises kullanarak hata kontrolü yap
     with pytest.raises(ValueError):
-        Book(isbn="invalid", title="Test", author="Author", year=2020)
+        Book(isbn="0306406153", title="Test", author="Author", year=2020)
 
-# --- Test: Borrow İşlemi ---
+# --- Test: borrow book ---
 def test_borrow_book(sample_book):
     """Test borrowing a book"""
-    # TODO: Implement
-    # 1. borrow_book çağır
-    # 2. is_borrowed True mu?
-    # 3. borrower_id doğru mu?
-    # 4. borrowed_at None değil mi?
-    pass
+    sample_book.borrow_book("Jack")
+    assert sample_book.is_borrowed == True
+    assert sample_book.borrower_id == "Jack"
+    assert sample_book.borrowed_at == "2026-01-26"
 
-# --- Test: Aynı Kitabı İki Kez Ödünç Alma ---
+# --- Test: Try to boorow book twice ---
 def test_borrow_already_borrowed_book(sample_book):
     """Test borrowing an already borrowed book raises error"""
-    # TODO: Implement
-    # 1. İlk ödünç alma
-    # 2. İkinci ödünç almada ValueError bekliyoruz
-    pass
+    sample_book.borrow_book("Jack")
+    assert sample_book.borrow_book("Mesut")
 
-# --- Test: İade İşlemi ---
+
+# --- Test: Return book ---
 def test_return_book(sample_book):
     """Test returning a book"""
-    # TODO: Implement
-    pass
+    sample_book.return_book()
+    assert sample_book.is_borrowed == False
+    assert sample_book.returned_at == "2026-01-26"
+    assert sample_book.borrower_id == None
+    assert sample_book.borrowed_at == None
 
-# --- Test: Ödünç Alınmamış Kitabı İade Etme ---
+# --- Test:Returning a not borrowed book ---
 def test_return_not_borrowed_book(sample_book):
     """Test returning a book that was not borrowed"""
-    # TODO: Implement
-    pass
+    assert sample_book.return_book()
