@@ -1,7 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Optional
 from datetime import datetime
-import re
 
 @dataclass(eq=True, frozen=False)
 class Book:
@@ -25,7 +24,7 @@ class Book:
 
         # Validate ISBN
         if not self._validate_isbn(clean_isbn):
-            raise ValueError(f"Invalid ISBN: {self.isbn}.")
+            raise ValueError(f"Invalid ISBN: {clean_isbn}.")
         
         # Control other information
         if not self.title or not self.title.strip():
@@ -50,15 +49,15 @@ class Book:
         return clean_isbn
 
     @staticmethod
-    def _validate_isbn(self, isbn: str) -> bool:
-        clean_isbn = self._clean_isbn(isbn)
+    def _validate_isbn(isbn: str) -> bool:
+        clean_isbn = Book._clean_isbn(isbn)
 
         if len(clean_isbn) == 10:
-            return self._validate_isbn10(clean_isbn)
+            return Book._validate_isbn10(clean_isbn)
         elif len(clean_isbn) == 13:
-            return self._validate_isbn13(clean_isbn)
+            return Book._validate_isbn13(clean_isbn)
         else:
-            raise ValueError
+            return False
     
     @staticmethod
     def _validate_isbn10(isbn: str) -> bool:
