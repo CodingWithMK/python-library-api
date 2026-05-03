@@ -21,10 +21,9 @@ class Book:
         """
         # Clean ISBN
         clean_isbn = self._clean_isbn(self.isbn)
-
-        # Validate ISBN
-        if not self._validate_isbn(clean_isbn):
-            raise ValueError(f"Invalid ISBN: {clean_isbn}.")
+        
+        # Check year of publishment
+        self.validate_year()
         
         # Control other information
         if not self.title or not self.title.strip():
@@ -36,9 +35,11 @@ class Book:
         if len(clean_isbn) == 10:
             if not self._validate_isbn10(clean_isbn):
                 raise ValueError(f"Invalid ISBN-10 checksum: {self.isbn}")
-        else:
+        elif len(clean_isbn) == 13:
             if not self._validate_isbn13(clean_isbn):
                 raise ValueError(f"Invalid ISBN-13 checksum: {self.isbn}")
+        else:
+            raise ValueError(f"ISBN must be 10 or 13 digits, got {len(clean_isbn)}")
         
 
     @staticmethod
@@ -47,17 +48,6 @@ class Book:
         # Keep digits and 'X' or 'x' only
         clean_isbn = "".join(c for c in isbn_string.upper() if c.isdigit() or c == 'X')
         return clean_isbn
-
-    @staticmethod
-    def _validate_isbn(isbn: str) -> bool:
-        clean_isbn = Book._clean_isbn(isbn)
-
-        if len(clean_isbn) == 10:
-            return Book._validate_isbn10(clean_isbn)
-        elif len(clean_isbn) == 13:
-            return Book._validate_isbn13(clean_isbn)
-        else:
-            return False
     
     @staticmethod
     def _validate_isbn10(isbn: str) -> bool:
@@ -91,7 +81,7 @@ class Book:
 
     
     def __str__(self):
-        return f"{self.title} from {self.author} published in {self.year} corresponds to genre {self.genre}.\nBorrow Status: {self.is_borrowed}\nBorrowed at: {self.borrowed_at}"
+        return f"{self.title} by {self.author} (ISBN:{self.isbn})"
 
     def validate_year(self):
         """Validate publication year of the book."""
@@ -102,7 +92,7 @@ class Book:
         elif self.year < 1450 or self.year > datetime.now().year:
             raise ValueError(f"The book {self.title} from {self.year} is out of publishment range.")
         else:
-            return self.year
+            return True
           
 
     def borrow_book(self, borrower_name: str) -> None:
@@ -113,12 +103,10 @@ class Book:
         if not self.is_borrowed:
             self.is_borrowed = True
             self.borrower_id = borrower_name
+            self.borrowed_at = datetime.now()
         else:
             raise ValueError(f"{self.title} is already borrowed by {borrower_name}.")
-            self.is_borrowed = False
-        
-        self.borrower_id = borrower_name
-        self.borrowed_at = datetime.now()
+
 
 
     def return_book(self) -> None:
@@ -127,7 +115,6 @@ class Book:
             self.is_borrowed = False
         else:
             raise ValueError(f"{self.title} was not borrowed. Borrow now.")
-            self.is_borrowed = True
         
         self.returned_at = datetime.now()
         self.borrower_id = None
